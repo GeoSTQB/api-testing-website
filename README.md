@@ -4,6 +4,9 @@
 
 A simple Flask-based web application for testing API endpoints with a user-friendly interface. This project demonstrates basic CRUD operations (Create, Read, Update, Delete) for user management.
 
+![image](https://github.com/user-attachments/assets/79346231-a374-495e-b918-e6c50d985044)
+
+
 ## ✨ Features
 
 - User-friendly web interface
