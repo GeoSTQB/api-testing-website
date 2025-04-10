@@ -133,6 +133,17 @@
             color: #8b949e;
         }
 
+        .note {
+            display: inline-block;
+            padding: 8px 12px;
+            background-color: #1f2937;
+            border-left: 4px solid #58a6ff;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-style: italic;
+            color: #8b949e;
+        }
+
         .header-buttons {
             display: flex;
             gap: 1rem;
@@ -161,7 +172,7 @@
             <section class="test-section">
                 <h2>Silent 200 OK with Errors</h2>
                 <p>Test an API that returns 200 OK even when there are errors:</p>
-                <p>> Username length should be more than 3 characters:</p>
+                <p class="note">⚠️ Username length should be more than 3 characters</p>
                 <div class="test-inputs">
                     <input type="text" id="silent-error-username" placeholder="Enter username" class="user-input">
                     <button onclick="testSilentError()" class="test-button">Test Silent Error</button>
