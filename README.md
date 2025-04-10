@@ -4,21 +4,21 @@
 
 A simple Flask-based web application for testing API endpoints with a user-friendly interface. This project demonstrates basic CRUD operations (Create, Read, Update, Delete) for user management.
 
-## Features
+## ✨ Features
 
 - User-friendly web interface
 - RESTful API endpoints for user management
 - Interactive Swagger documentation
 - Modern UI with responsive design
 
-## Prerequisites
+## 📋 Prerequisites
 
 Before you begin, ensure you have the following installed:
 - Python 3.7 or higher
 - pip (Python package installer)
 - Git (for cloning the repository)
 
-## Installation
+## 🛠️ Installation
 
 1. Clone the repository:
 ```bash
@@ -46,7 +46,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 api-testing-website/
@@ -62,7 +62,7 @@ api-testing-website/
     └── index.html     # Main HTML template
 ```
 
-## Running the Application
+## 🚀 Running the Application
 
 1. Make sure you're in the project directory and your virtual environment is activated.
 
@@ -76,14 +76,14 @@ python app.py
 http://127.0.0.1:5000
 ```
 
-## API Documentation
+## 📚 API Documentation
 
 The application includes Swagger documentation. To access it, visit:
 ```
 http://127.0.0.1:5000/apidocs
 ```
 
-## Available API Endpoints
+## 🔌 Available API Endpoints
 
 - `GET /api/users` - Get all users
 - `POST /api/users` - Create a new user
@@ -92,7 +92,7 @@ http://127.0.0.1:5000/apidocs
 - `PATCH /api/users/<id>` - Partially update a user
 - `DELETE /api/users/<id>` - Delete a user
 
-## Using the Web Interface
+## 💻 Using the Web Interface
 
 1. **View Users**
    - The main page displays a list of all registered users
@@ -103,7 +103,7 @@ http://127.0.0.1:5000/apidocs
    - Click the "Create New User" button
    - The new user will appear in the list
 
-## Troubleshooting
+## ⚠️ Troubleshooting
 
 If you encounter any issues:
 
@@ -119,6 +119,6 @@ If you encounter any issues:
    - Make sure you're running the application through Flask
    - Don't open the HTML file directly in the browser
 
-## License
+## 📄 License
 
 This project is licensed under the Apache License 2.0 - see the LICENSE file for details. 
