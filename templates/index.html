@@ -10,19 +10,37 @@
     <header>
         <img src="{{ url_for('static', filename='icons/GeoSQTB vector logo.png') }}" alt="GeoSQTB Logo" style="height: 50px; margin-right: 10px;">
         <h1>Registered Users</h1>
+        <a href="/apidocs" class="api-docs-button">API Documentation</a>
     </header>
-    <main>
-        <section id="user-list-container">
-            <h2>Users</h2>
-            <ul id="user-list">
-                <!-- User items will be added here by JavaScript -->
-            </ul>
-        </section>
-        <div class="create-user-form">
-            <input type="text" id="new-user-name" placeholder="Enter user name" class="user-input">
-            <button id="create-user-button" onclick="createUser()">Create New User</button>
-        </div>
-    </main>
+    <div class="container">
+        <main>
+            <section id="user-list-container">
+                <h2>Users</h2>
+                <ul id="user-list">
+                    <!-- User items will be added here by JavaScript -->
+                </ul>
+            </section>
+            <div class="create-user-form">
+                <input type="text" id="new-user-name" placeholder="Enter user name" class="user-input">
+                <button id="create-user-button" onclick="createUser()">Create New User</button>
+            </div>
+        </main>
+        <aside id="user-actions" class="sidebar">
+            <h2>User Actions</h2>
+            <div id="selected-user-info">
+                <p>Select a user to perform actions</p>
+            </div>
+            <div class="action-buttons">
+                <button id="edit-user-button" class="edit-button" onclick="editSelectedUser()" disabled>Edit User</button>
+                <button id="delete-user-button" class="delete-button" onclick="deleteSelectedUser()" disabled>Delete User</button>
+            </div>
+            <div id="edit-form" class="hidden">
+                <input type="text" id="edit-user-name" placeholder="New name" class="user-input">
+                <button onclick="saveUserEdit()" class="save-button">Save</button>
+                <button onclick="cancelEdit()" class="cancel-button">Cancel</button>
+            </div>
+        </aside>
+    </div>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html> 

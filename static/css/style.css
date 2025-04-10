@@ -21,20 +21,128 @@ header h1 {
     margin-right: auto;
 }
 
-main {
+.api-docs-button {
+    background-color: #ff9800;
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.api-docs-button:hover {
+    background-color: #f57c00;
+    transform: translateY(-1px);
+}
+
+.api-docs-button:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.container {
+    display: flex;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
     padding: 2rem;
-    max-width: 800px;
-    margin: 2rem auto;
+}
+
+main {
+    flex: 1;
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    padding: 2rem;
 }
 
-#user-list-container h2 {
-    color: #3949ab; /* Indigo darker */
+.sidebar {
+    width: 300px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    padding: 1.5rem;
+}
+
+.sidebar h2 {
+    color: #3949ab;
+    margin-top: 0;
     border-bottom: 2px solid #e0e0e0;
     padding-bottom: 0.5rem;
-    margin-bottom: 1rem;
+}
+
+#selected-user-info {
+    margin: 1rem 0;
+    padding: 1rem;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 1rem 0;
+}
+
+.edit-button, .delete-button, .save-button, .cancel-button {
+    padding: 0.8rem 1rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.edit-button {
+    background-color: #4caf50;
+    color: white;
+}
+
+.edit-button:hover {
+    background-color: #388e3c;
+}
+
+.delete-button {
+    background-color: #f44336;
+    color: white;
+}
+
+.delete-button:hover {
+    background-color: #d32f2f;
+}
+
+.save-button {
+    background-color: #2196f3;
+    color: white;
+}
+
+.save-button:hover {
+    background-color: #1976d2;
+}
+
+.cancel-button {
+    background-color: #9e9e9e;
+    color: white;
+}
+
+.cancel-button:hover {
+    background-color: #757575;
+}
+
+button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.hidden {
+    display: none;
+}
+
+#edit-form {
+    margin-top: 1rem;
 }
 
 #user-list {
@@ -49,10 +157,16 @@ main {
     padding: 0.8rem 1rem;
     margin-bottom: 0.5rem;
     transition: background-color 0.2s ease;
+    cursor: pointer;
 }
 
 #user-list li:hover {
-    background-color: #e8eaf6; /* Indigo lighter */
+    background-color: #e8eaf6;
+}
+
+#user-list li.selected {
+    background-color: #c5cae9;
+    border-color: #3f51b5;
 }
 
 .create-user-form {
@@ -78,7 +192,7 @@ main {
 }
 
 #create-user-button {
-    background-color: #5c6bc0; /* Indigo */
+    background-color: #5c6bc0;
     color: white;
     border: none;
     border-radius: 4px;
@@ -91,7 +205,7 @@ main {
 }
 
 #create-user-button:hover {
-    background-color: #3949ab; /* Indigo darker */
+    background-color: #3949ab;
     transform: translateY(-1px);
 }
 
