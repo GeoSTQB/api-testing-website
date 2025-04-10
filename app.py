@@ -76,15 +76,19 @@ def create_user():
             name:
               type: string
       400:
-        description: Missing 'name' in request body
+        description: Missing 'name' in request body or name is empty/contains only spaces
     """
     global next_user_id
     if not request.json or not 'name' in request.json:
         return jsonify({'error': 'Missing name in request body'}), 400
 
+    name = request.json['name'].strip()
+    if not name:
+        return jsonify({'error': 'Name cannot be empty or contain only spaces'}), 400
+
     new_user = {
         'id': next_user_id,
-        'name': request.json['name']
+        'name': name
     }
     users.append(new_user)
     next_user_id += 1
