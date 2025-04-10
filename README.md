@@ -1,4 +1,6 @@
-# API Testing Website
+<img align=right style="width: 5em;" src="static/icons/GeoSQTB%20vector%20logo.png">
+
+# 🚀 API Testing Website
 
 A simple Flask-based web application for testing API endpoints with a user-friendly interface. This project demonstrates basic CRUD operations (Create, Read, Update, Delete) for user management.
 
