@@ -117,10 +117,6 @@ If you encounter any issues:
    - Make sure you're running the application through Flask
    - Don't open the HTML file directly in the browser
 
-## Contributing
-
-Feel free to submit issues and enhancement requests!
-
 ## License
 
 This project is licensed under the Apache License 2.0 - see the LICENSE file for details. 
