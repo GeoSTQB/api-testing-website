@@ -6,75 +6,143 @@
     <title>API Testing Page</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
+        body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+        }
+
+        header {
+            background-color: #161b22;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .container {
+            background-color: #0d1117;
+        }
+
+        main {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+        }
+
         .test-section {
             margin: 20px 0;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            padding: 20px;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            background-color: #0d1117;
         }
+
+        .test-section h2 {
+            color: #58a6ff;
+            margin-top: 0;
+            border-bottom: 1px solid #30363d;
+            padding-bottom: 10px;
+        }
+
         .test-result {
-            margin-top: 10px;
-            padding: 10px;
-            background-color: #f5f5f5;
-            border-radius: 4px;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #161b22;
+            border-radius: 6px;
+            border: 1px solid #30363d;
+            font-family: monospace;
         }
+
         .error {
-            color: red;
+            color: #ff7b72;
         }
+
         .success {
-            color: green;
+            color: #7ee787;
+        }
+
+        .test-inputs {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .user-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            background-color: #0d1117;
+            color: #c9d1d9;
+            font-size: 14px;
+        }
+
+        .user-input:focus {
+            outline: none;
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.3);
+        }
+
+        button {
+            background-color: #238636;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #2ea043;
+        }
+
+        .test-explanation {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #161b22;
+            border-radius: 6px;
+            border: 1px solid #30363d;
+        }
+
+        .test-explanation ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .test-explanation li {
+            margin: 5px 0;
+            color: #8b949e;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-left: auto;
+        }
+
+        .api-docs-button {
+            background-color: #238636;
+        }
+
+        .api-docs-button:hover {
+            background-color: #2ea043;
         }
     </style>
 </head>
 <body>
     <header>
         <img src="{{ url_for('static', filename='icons/GeoSQTB vector logo.png') }}" alt="GeoSQTB Logo" style="height: 50px; margin-right: 10px;">
-        <h1>API Testing Page</h1>
-        <a href="/" class="api-docs-button">Back to Main Page</a>
+        <h1>API Testing Playground</h1>
+        <div class="header-buttons">
+            <a href="/" class="api-docs-button">Back to Main Page</a>
+        </div>
     </header>
     <div class="container">
         <main>
             <section class="test-section">
-                <h2>1. Invalid POST Request</h2>
-                <p>Try to create a user without providing a name:</p>
-                <button onclick="testInvalidPost()">Test Invalid POST</button>
-                <div id="invalid-post-result" class="test-result"></div>
-            </section>
-
-            <section class="test-section">
-                <h2>2. GET Non-existent User</h2>
-                <p>Try to get a user that doesn't exist:</p>
-                <button onclick="testGetNonExistentUser()">Test GET Non-existent User</button>
-                <div id="get-nonexistent-result" class="test-result"></div>
-            </section>
-
-            <section class="test-section">
-                <h2>3. Invalid Data Type</h2>
-                <p>Try to create a user with invalid data type:</p>
-                <button onclick="testInvalidDataType()">Test Invalid Data Type</button>
-                <div id="invalid-type-result" class="test-result"></div>
-            </section>
-
-            <section class="test-section">
-                <h2>4. Network Timeout</h2>
-                <p>Simulate a network timeout:</p>
-                <button onclick="testNetworkTimeout()">Test Network Timeout</button>
-                <div id="timeout-result" class="test-result"></div>
-            </section>
-
-            <section class="test-section">
-                <h2>5. Rate Limiting</h2>
-                <p>Test multiple rapid requests:</p>
-                <button onclick="testRateLimiting()">Test Rate Limiting</button>
-                <div id="rate-limit-result" class="test-result"></div>
-            </section>
-
-            <section class="test-section">
-                <h2>6. Silent 200 OK with Errors</h2>
+                <h2>Silent 200 OK with Errors</h2>
                 <p>Test an API that returns 200 OK even when there are errors:</p>
                 <div class="test-inputs">
                     <input type="text" id="silent-error-username" placeholder="Enter username" class="user-input">
-                    <button onclick="testSilentError()">Test Silent Error</button>
+                    <button onclick="testSilentError()" class="test-button">Test Silent Error</button>
                 </div>
                 <div id="silent-error-result" class="test-result"></div>
                 <div class="test-explanation">
@@ -90,97 +158,6 @@
         </main>
     </div>
     <script>
-        function testInvalidPost() {
-            fetch('/api/users', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({})
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('invalid-post-result').innerHTML = 
-                    `<p class="error">Error: ${data.error}</p>`;
-            })
-            .catch(error => {
-                document.getElementById('invalid-post-result').innerHTML = 
-                    `<p class="error">Error: ${error.message}</p>`;
-            });
-        }
-
-        function testGetNonExistentUser() {
-            fetch('/api/users/999999')
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('get-nonexistent-result').innerHTML = 
-                    `<p class="error">Error: ${data.error}</p>`;
-            })
-            .catch(error => {
-                document.getElementById('get-nonexistent-result').innerHTML = 
-                    `<p class="error">Error: ${error.message}</p>`;
-            });
-        }
-
-        function testInvalidDataType() {
-            fetch('/api/users', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    name: 12345  // Invalid: name should be a string
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('invalid-type-result').innerHTML = 
-                    `<p class="error">Error: ${data.error || 'Invalid data type'}</p>`;
-            })
-            .catch(error => {
-                document.getElementById('invalid-type-result').innerHTML = 
-                    `<p class="error">Error: ${error.message}</p>`;
-            });
-        }
-
-        function testNetworkTimeout() {
-            fetch('/api/users', {
-                method: 'GET',
-                signal: AbortSignal.timeout(100)  // 100ms timeout
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('timeout-result').innerHTML = 
-                    `<p class="success">Success: ${JSON.stringify(data)}</p>`;
-            })
-            .catch(error => {
-                document.getElementById('timeout-result').innerHTML = 
-                    `<p class="error">Error: ${error.name === 'AbortError' ? 'Request timed out' : error.message}</p>`;
-            });
-        }
-
-        function testRateLimiting() {
-            const results = [];
-            for (let i = 0; i < 10; i++) {
-                fetch('/api/users')
-                .then(response => response.json())
-                .then(data => {
-                    results.push(`Request ${i + 1}: Success`);
-                    if (results.length === 10) {
-                        document.getElementById('rate-limit-result').innerHTML = 
-                            `<p>Results:</p><ul>${results.map(r => `<li>${r}</li>`).join('')}</ul>`;
-                    }
-                })
-                .catch(error => {
-                    results.push(`Request ${i + 1}: Failed - ${error.message}`);
-                    if (results.length === 10) {
-                        document.getElementById('rate-limit-result').innerHTML = 
-                            `<p>Results:</p><ul>${results.map(r => `<li>${r}</li>`).join('')}</ul>`;
-                    }
-                });
-            }
-        }
-
         function testSilentError() {
             const username = document.getElementById('silent-error-username').value;
             fetch('/api/silent-error', {
@@ -200,7 +177,8 @@
             .then(data => {
                 const resultDiv = document.getElementById('silent-error-result');
                 resultDiv.innerHTML += `
-                    <p><strong>Response Body:</strong> ${JSON.stringify(data, null, 2)}</p>
+                    <p><strong>Response Body:</strong></p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
                     <p class="${data.success ? 'success' : 'error'}">
                         ${data.success ? '✅ Success!' : '❌ Error in response body!'}
                     </p>
@@ -208,7 +186,7 @@
             })
             .catch(error => {
                 document.getElementById('silent-error-result').innerHTML = 
-                    `<p class="error">Error: ${error.message}</p>`;
+                    `<p class="error">❌ Error: ${error.message}</p>`;
             });
         }
     </script>
