@@ -31,6 +31,12 @@
             border: 1px solid #30363d;
             border-radius: 6px;
             background-color: #0d1117;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .test-section:not(:last-child) {
+            margin-bottom: 40px;
+            border-bottom: 2px solid #30363d;
         }
 
         .test-section h2 {
@@ -38,6 +44,21 @@
             margin-top: 0;
             border-bottom: 1px solid #30363d;
             padding-bottom: 10px;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .test-section p:first-of-type {
+            font-size: 1.1em;
+            color: #c9d1d9;
+            margin-bottom: 20px;
+        }
+
+        .test-section-divider {
+            height: 2px;
+            background-color: #30363d;
+            margin: 40px 0;
+            border-radius: 2px;
         }
 
         .test-result {
@@ -140,6 +161,7 @@
             <section class="test-section">
                 <h2>Silent 200 OK with Errors</h2>
                 <p>Test an API that returns 200 OK even when there are errors:</p>
+                <p>> Username length should be more than 3 characters:</p>
                 <div class="test-inputs">
                     <input type="text" id="silent-error-username" placeholder="Enter username" class="user-input">
                     <button onclick="testSilentError()" class="test-button">Test Silent Error</button>
@@ -152,6 +174,47 @@
                         <li>Errors are only indicated in the response body</li>
                         <li>This is a common anti-pattern in legacy APIs</li>
                         <li>Always check both status code AND response body</li>
+                    </ul>
+                </div>
+            </section>
+
+            <div class="test-section-divider"></div>
+
+            <section class="test-section">
+                <h2>Double POST Due to Retry Without Idempotency</h2>
+                <p>Test an API that creates async tasks and can lead to duplicate operations:</p>
+                <div class="test-inputs">
+                    <input type="text" id="async-task-description" placeholder="Enter task description" class="user-input">
+                    <button onclick="createAsyncTask()" class="test-button">Create Task</button>
+                </div>
+                <div id="async-task-result" class="test-result"></div>
+                <div class="test-explanation">
+                    <p><strong>What's happening:</strong></p>
+                    <ul>
+                        <li>The API accepts a task and returns immediately with a task ID</li>
+                        <li>The task is processed asynchronously in the background</li>
+                        <li>If the client retries due to network issues, duplicate tasks may be created</li>
+                        <li>This demonstrates the importance of idempotency in APIs</li>
+                    </ul>
+                </div>
+            </section>
+
+            <div class="test-section-divider"></div>
+
+            <section class="test-section">
+                <h2>GET Returns 200 but Data is Missing</h2>
+                <p>Test an API that returns 200 OK but with missing or incomplete data:</p>
+                <div class="test-inputs">
+                    <button onclick="testIncompleteData()" class="test-button">Test Incomplete Data</button>
+                </div>
+                <div id="incomplete-data-result" class="test-result"></div>
+                <div class="test-explanation">
+                    <p><strong>What's happening:</strong></p>
+                    <ul>
+                        <li>The API always returns HTTP 200 OK</li>
+                        <li>Data may be missing or incomplete in the response</li>
+                        <li>This is a common issue in APIs with optional fields</li>
+                        <li>Always validate the presence of required data fields</li>
                     </ul>
                 </div>
             </section>
@@ -188,6 +251,94 @@
                 document.getElementById('silent-error-result').innerHTML = 
                     `<p class="error">❌ Error: ${error.message}</p>`;
             });
+        }
+
+        function createAsyncTask() {
+            const description = document.getElementById('async-task-description').value;
+            if (!description) {
+                document.getElementById('async-task-result').innerHTML = 
+                    '<p class="error">❌ Please enter a task description</p>';
+                return;
+            }
+
+            fetch('/api/async-tasks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ description })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultDiv = document.getElementById('async-task-result');
+                resultDiv.innerHTML = `
+                    <p><strong>Task Created:</strong></p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                    <p class="success">✅ Task created successfully! Check status below:</p>
+                    <div class="test-inputs">
+                        <input type="text" id="task-id" value="${data.task_id}" class="user-input" readonly>
+                        <button onclick="checkTaskStatus()" class="test-button">Check Status</button>
+                    </div>
+                    <div id="task-status-result" class="test-result"></div>
+                `;
+            })
+            .catch(error => {
+                document.getElementById('async-task-result').innerHTML = 
+                    `<p class="error">❌ Error: ${error.message}</p>`;
+            });
+        }
+
+        function checkTaskStatus() {
+            const taskId = document.getElementById('task-id').value;
+            fetch(`/api/async-tasks/${taskId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const resultDiv = document.getElementById('task-status-result');
+                    resultDiv.innerHTML = `
+                        <p><strong>Task Status:</strong></p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                        <p class="${data.status === 'completed' ? 'success' : 'error'}">
+                            ${data.status === 'completed' ? '✅ Task completed!' : '⏳ Task still processing...'}
+                        </p>
+                    `;
+                })
+                .catch(error => {
+                    document.getElementById('task-status-result').innerHTML = 
+                        `<p class="error">❌ Error: ${error.message}</p>`;
+                });
+        }
+
+        function testIncompleteData() {
+            fetch('/api/incomplete-data')
+                .then(response => response.json())
+                .then(data => {
+                    const resultDiv = document.getElementById('incomplete-data-result');
+                    resultDiv.innerHTML = `
+                        <p><strong>Response:</strong></p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                        <p><strong>Data Validation:</strong></p>
+                        <ul>
+                            <li>User object present: ${data.data && data.data.user ? '✅' : '❌'}</li>
+                            <li>Email field present: ${data.data?.user?.email ? '✅' : '❌'}</li>
+                            <li>Profile object present: ${data.data?.user?.profile ? '✅' : '❌'}</li>
+                            <li>Profile bio present: ${data.data?.user?.profile?.bio ? '✅' : '❌'}</li>
+                            <li>Profile avatar present: ${data.data?.user?.profile?.avatar ? '✅' : '❌'}</li>
+                        </ul>
+                        <p class="${isDataComplete(data) ? 'success' : 'error'}">
+                            ${isDataComplete(data) ? '✅ All required data is present!' : '❌ Some data is missing!'}
+                        </p>
+                    `;
+                })
+                .catch(error => {
+                    document.getElementById('incomplete-data-result').innerHTML = 
+                        `<p class="error">❌ Error: ${error.message}</p>`;
+                });
+        }
+
+        function isDataComplete(data) {
+            return data.data?.user?.email && 
+                   data.data?.user?.profile?.bio && 
+                   data.data?.user?.profile?.avatar;
         }
     </script>
 </body>

@@ -1,5 +1,7 @@
 from flask import Flask, jsonify, request, render_template
 from flasgger import Swagger
+from datetime import datetime
+import uuid
 
 app = Flask(__name__)
 swagger = Swagger(app)
@@ -11,6 +13,12 @@ users = [
     {'id': 3, 'name': 'Charlie'}
 ]
 next_user_id = 4
+
+# In-memory storage for async tasks
+async_tasks = {}
+
+def generate_unique_id():
+    return str(uuid.uuid4())
 
 # --- API Endpoints ---
 
@@ -300,6 +308,181 @@ def silent_error():
         'success': True,
         'message': 'User created successfully'
     })
+
+@app.route('/api/async-tasks', methods=['POST'])
+def create_async_task():
+    """
+    Creates a new async task.
+    ---
+    tags:
+      - Async Tasks
+    parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          required:
+            - description
+          properties:
+            description:
+              type: string
+              description: Description of the task
+    responses:
+      200:
+        description: Task created successfully
+        schema:
+          type: object
+          properties:
+            task_id:
+              type: string
+              description: ID of the created task
+    """
+    if not request.json or 'description' not in request.json:
+        return jsonify({'error': 'Missing description in request body'}), 400
+
+    task_id = generate_unique_id()
+    task = {
+        'id': task_id,
+        'description': request.json['description'],
+        'status': 'pending',
+        'created_at': datetime.now().isoformat(),
+        'error': None
+    }
+    async_tasks[task_id] = task
+
+    # Simulate async task completion after 5 seconds
+    def complete_task():
+        import time
+        time.sleep(5)
+        async_tasks[task_id]['status'] = 'completed'
+
+    import threading
+    threading.Thread(target=complete_task).start()
+
+    return jsonify({'task_id': task_id}), 200
+
+@app.route('/api/async-tasks/<task_id>', methods=['GET'])
+def get_async_task(task_id):
+    """
+    Gets the status of an async task.
+    ---
+    tags:
+      - Async Tasks
+    parameters:
+      - name: task_id
+        in: path
+        type: string
+        required: true
+        description: ID of the task to retrieve
+    responses:
+      200:
+        description: Task status
+        schema:
+          type: object
+          properties:
+            id:
+              type: string
+            status:
+              type: string
+            created_at:
+              type: string
+            error:
+              type: string
+      404:
+        description: Task not found
+    """
+    if task_id not in async_tasks:
+        return jsonify({'error': 'Task not found'}), 404
+    
+    return jsonify(async_tasks[task_id])
+
+@app.route('/api/incomplete-data', methods=['GET'])
+def get_incomplete_data():
+    """
+    Demonstrates an API that returns 200 OK but with missing or incomplete data.
+    ---
+    tags:
+      - Testing
+    responses:
+      200:
+        description: Always returns 200 OK, but data may be missing or incomplete
+        schema:
+          type: object
+          properties:
+            status:
+              type: string
+            data:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    email:
+                      type: string
+                    profile:
+                      type: object
+                      properties:
+                        bio:
+                          type: string
+                        avatar:
+                          type: string
+    """
+    # Simulate different scenarios of incomplete data
+    import random
+    scenario = random.randint(1, 4)
+    
+    if scenario == 1:
+        # Empty data object
+        return jsonify({
+            'status': 'success',
+            'data': {}
+        })
+    elif scenario == 2:
+        # Partial user data
+        return jsonify({
+            'status': 'success',
+            'data': {
+                'user': {
+                    'id': 1,
+                    'name': 'John Doe'
+                    # Missing email and profile
+                }
+            }
+        })
+    elif scenario == 3:
+        # Nested missing data
+        return jsonify({
+            'status': 'success',
+            'data': {
+                'user': {
+                    'id': 1,
+                    'name': 'John Doe',
+                    'email': 'john@example.com',
+                    'profile': {}  # Empty profile object
+                }
+            }
+        })
+    else:
+        # Complete data (rare case)
+        return jsonify({
+            'status': 'success',
+            'data': {
+                'user': {
+                    'id': 1,
+                    'name': 'John Doe',
+                    'email': 'john@example.com',
+                    'profile': {
+                        'bio': 'Software Developer',
+                        'avatar': 'https://example.com/avatar.jpg'
+                    }
+                }
+            }
+        })
 
 if __name__ == '__main__':
     app.run(debug=True) 
