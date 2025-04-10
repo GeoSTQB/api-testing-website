@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Testing Page</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-result {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="{{ url_for('static', filename='icons/GeoSQTB vector logo.png') }}" alt="GeoSQTB Logo" style="height: 50px; margin-right: 10px;">
+        <h1>API Testing Page</h1>
+        <a href="/" class="api-docs-button">Back to Main Page</a>
+    </header>
+    <div class="container">
+        <main>
+            <section class="test-section">
+                <h2>1. Invalid POST Request</h2>
+                <p>Try to create a user without providing a name:</p>
+                <button onclick="testInvalidPost()">Test Invalid POST</button>
+                <div id="invalid-post-result" class="test-result"></div>
+            </section>
+
+            <section class="test-section">
+                <h2>2. GET Non-existent User</h2>
+                <p>Try to get a user that doesn't exist:</p>
+                <button onclick="testGetNonExistentUser()">Test GET Non-existent User</button>
+                <div id="get-nonexistent-result" class="test-result"></div>
+            </section>
+
+            <section class="test-section">
+                <h2>3. Invalid Data Type</h2>
+                <p>Try to create a user with invalid data type:</p>
+                <button onclick="testInvalidDataType()">Test Invalid Data Type</button>
+                <div id="invalid-type-result" class="test-result"></div>
+            </section>
+
+            <section class="test-section">
+                <h2>4. Network Timeout</h2>
+                <p>Simulate a network timeout:</p>
+                <button onclick="testNetworkTimeout()">Test Network Timeout</button>
+                <div id="timeout-result" class="test-result"></div>
+            </section>
+
+            <section class="test-section">
+                <h2>5. Rate Limiting</h2>
+                <p>Test multiple rapid requests:</p>
+                <button onclick="testRateLimiting()">Test Rate Limiting</button>
+                <div id="rate-limit-result" class="test-result"></div>
+            </section>
+
+            <section class="test-section">
+                <h2>6. Silent 200 OK with Errors</h2>
+                <p>Test an API that returns 200 OK even when there are errors:</p>
+                <div class="test-inputs">
+                    <input type="text" id="silent-error-username" placeholder="Enter username" class="user-input">
+                    <button onclick="testSilentError()">Test Silent Error</button>
+                </div>
+                <div id="silent-error-result" class="test-result"></div>
+                <div class="test-explanation">
+                    <p><strong>What's happening:</strong></p>
+                    <ul>
+                        <li>The API always returns HTTP 200 OK</li>
+                        <li>Errors are only indicated in the response body</li>
+                        <li>This is a common anti-pattern in legacy APIs</li>
+                        <li>Always check both status code AND response body</li>
+                    </ul>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script>
+        function testInvalidPost() {
+            fetch('/api/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('invalid-post-result').innerHTML = 
+                    `<p class="error">Error: ${data.error}</p>`;
+            })
+            .catch(error => {
+                document.getElementById('invalid-post-result').innerHTML = 
+                    `<p class="error">Error: ${error.message}</p>`;
+            });
+        }
+
+        function testGetNonExistentUser() {
+            fetch('/api/users/999999')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('get-nonexistent-result').innerHTML = 
+                    `<p class="error">Error: ${data.error}</p>`;
+            })
+            .catch(error => {
+                document.getElementById('get-nonexistent-result').innerHTML = 
+                    `<p class="error">Error: ${error.message}</p>`;
+            });
+        }
+
+        function testInvalidDataType() {
+            fetch('/api/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: 12345  // Invalid: name should be a string
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('invalid-type-result').innerHTML = 
+                    `<p class="error">Error: ${data.error || 'Invalid data type'}</p>`;
+            })
+            .catch(error => {
+                document.getElementById('invalid-type-result').innerHTML = 
+                    `<p class="error">Error: ${error.message}</p>`;
+            });
+        }
+
+        function testNetworkTimeout() {
+            fetch('/api/users', {
+                method: 'GET',
+                signal: AbortSignal.timeout(100)  // 100ms timeout
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('timeout-result').innerHTML = 
+                    `<p class="success">Success: ${JSON.stringify(data)}</p>`;
+            })
+            .catch(error => {
+                document.getElementById('timeout-result').innerHTML = 
+                    `<p class="error">Error: ${error.name === 'AbortError' ? 'Request timed out' : error.message}</p>`;
+            });
+        }
+
+        function testRateLimiting() {
+            const results = [];
+            for (let i = 0; i < 10; i++) {
+                fetch('/api/users')
+                .then(response => response.json())
+                .then(data => {
+                    results.push(`Request ${i + 1}: Success`);
+                    if (results.length === 10) {
+                        document.getElementById('rate-limit-result').innerHTML = 
+                            `<p>Results:</p><ul>${results.map(r => `<li>${r}</li>`).join('')}</ul>`;
+                    }
+                })
+                .catch(error => {
+                    results.push(`Request ${i + 1}: Failed - ${error.message}`);
+                    if (results.length === 10) {
+                        document.getElementById('rate-limit-result').innerHTML = 
+                            `<p>Results:</p><ul>${results.map(r => `<li>${r}</li>`).join('')}</ul>`;
+                    }
+                });
+            }
+        }
+
+        function testSilentError() {
+            const username = document.getElementById('silent-error-username').value;
+            fetch('/api/silent-error', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username })
+            })
+            .then(response => {
+                const resultDiv = document.getElementById('silent-error-result');
+                resultDiv.innerHTML = `
+                    <p><strong>HTTP Status:</strong> ${response.status} ${response.statusText}</p>
+                `;
+                return response.json();
+            })
+            .then(data => {
+                const resultDiv = document.getElementById('silent-error-result');
+                resultDiv.innerHTML += `
+                    <p><strong>Response Body:</strong> ${JSON.stringify(data, null, 2)}</p>
+                    <p class="${data.success ? 'success' : 'error'}">
+                        ${data.success ? '✅ Success!' : '❌ Error in response body!'}
+                    </p>
+                `;
+            })
+            .catch(error => {
+                document.getElementById('silent-error-result').innerHTML = 
+                    `<p class="error">Error: ${error.message}</p>`;
+            });
+        }
+    </script>
+</body>
+</html> 

@@ -248,5 +248,58 @@ def index():
     # Serve the main HTML page using render_template
     return render_template('index.html')
 
+@app.route('/api-testing')
+def api_testing():
+    # Serve the API testing page
+    return render_template('api_testing.html')
+
+@app.route('/api/silent-error', methods=['POST'])
+def silent_error():
+    """
+    Demonstrates a problematic API pattern where 200 OK is returned with an error in the body.
+    ---
+    tags:
+      - Testing
+    parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          required:
+            - username
+          properties:
+            username:
+              type: string
+              description: Username to validate
+    responses:
+      200:
+        description: Always returns 200 OK, even with errors
+        schema:
+          type: object
+          properties:
+            success:
+              type: boolean
+            error:
+              type: string
+    """
+    if not request.json or 'username' not in request.json:
+        return jsonify({
+            'success': False,
+            'error': 'Username is required'
+        })
+    
+    username = request.json['username']
+    if len(username) < 3:
+        return jsonify({
+            'success': False,
+            'error': 'Username must be at least 3 characters long'
+        })
+    
+    return jsonify({
+        'success': True,
+        'message': 'User created successfully'
+    })
+
 if __name__ == '__main__':
     app.run(debug=True) 
