@@ -49,22 +49,6 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## 📁 Project Structure
-
-```
-api-testing-website/
-├── app.py              # Main Flask application
-├── requirements.txt    # Python dependencies
-├── static/            # Static files
-│   ├── css/
-│   │   └── style.css  # Stylesheet
-│   ├── js/
-│   │   └── script.js  # JavaScript code
-│   └── icons/         # Image assets
-└── templates/
-    └── index.html     # Main HTML template
-```
-
 ## 🚀 Running the Application
 
 1. Make sure you're in the project directory and your virtual environment is activated.
